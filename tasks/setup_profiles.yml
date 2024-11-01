@@ -3,7 +3,7 @@
   hosts: all
   become: yes
   vars:
-    - teacher_password: "{{ 'probonopublico' | password_hash('sha512') }}"
+    - teacher_password: "{{ 'teacherpwhere' | password_hash('sha512') }}"
     - admin_password: "{{ 'admin_password_here' | password_hash('sha512') }}"
 
   tasks:
