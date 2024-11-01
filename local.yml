@@ -10,3 +10,4 @@
     - include: tasks/packages.yml
     - include: tasks/chron.yml
     - include: tasks/firefox_profiles.yml
+    - include: tasks/firefox_bookmark.yml
