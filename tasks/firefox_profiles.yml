@@ -1,0 +1,21 @@
+---
+- name: Setup and Configure Firefox Profiles
+  hosts: all
+  tasks:
+    - name: Create Firefox Profiles
+      ansible.builtin.command:
+        cmd: 'firefox -CreateProfile "{{ item }}"'
+      loop:
+        - "Learner"
+        - "Teacher"
+        - "Admin"
+
+    - name: Configure Firefox Profiles
+      ansible.builtin.command:
+        cmd: |
+          firefox -P "{{ item }}" -no-remote -setpref "browser.ssl_forbid_nonsecure=true"
+          firefox -P "{{ item }}" -no-remote -setpref "network.trr.uri=https://doh.familyshield.opendns.com/dns-query"
+      loop:
+        - "Learner"
+        - "Teacher"
+        - "Admin"
