@@ -1,0 +1,56 @@
+---
+- name: Add Bookmark to Firefox Teacher Profile
+  hosts: all
+  tasks:
+    - name: Ensure Teacher profile directory exists
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.mozilla/firefox/teacher-profile"
+        state: directory
+
+    - name: Create user.js file for Teacher profile
+      ansible.builtin.copy:
+        dest: "/home/{{ ansible_user }}/.mozilla/firefox/teacher-profile/user.js"
+        content: |
+          user_pref("browser.bookmarks.added_static_root", true);
+          user_pref("browser.bookmarks.restore_default_bookmarks", false);
+          user_pref("browser.bookmarks.showMobileBookmarks", false);
+          user_pref("browser.bookmarks.toolbarVisibility", "always");
+          user_pref("places.bookmarks.defaultLocation", "toolbar_____");
+          user_pref("browser.bookmarks.bookmarkbar.enabled", true);
+          user_pref("browser.bookmarks.livebookmarks.migrated", true);
+          user_pref("browser.bookmarks.openInTab", true);
+          user_pref("places.includeBookmarksInBackup", true);
+          user_pref("places.database.lastMaintenance", 1609459200);
+
+          // Adding Google Drive Bookmark
+          user_pref("browser.bookmarks.toolbarPosition", 0);
+          user_pref("browser.bookmarks.bookmarkbar.enabled", true);
+          user_pref("browser.bookmarks.added_static_root", true);
+          user_pref("browser.places.addBookmarkHere.maxItems", 5);
+          user_pref("places.history.expiration.max_pages", 100000);
+          user_pref("browser.places.addedStaticRoots", true);
+          user_pref("browser.places.addBookmarks", true);
+          user_pref("browser.bookmarks.added_bookmark_root", true);
+          user_pref("browser.places.defaultBookmarksEnabled", false);
+          user_pref("browser.bookmarks.defaultLocation", "toolbar");
+          user_pref("browser.bookmarks.liveBookmarksMoved", true);
+          user_pref("browser.bookmarks.restoreDefaults", false);
+          user_pref("browser.bookmarks.createInToolbar", true);
+          user_pref("places.smartBookmarksVersion", 8);
+          user_pref("browser.bookmarks.showInToolbar", true);
+
+          // Google Drive bookmark
+          user_pref("browser.bookmarks.toolbar.bookmarkAdded", true);
+          user_pref("browser.bookmarks.bookmarkbar.visible", true);
+          user_pref("browser.bookmarks.folders.visible", true);
+          user_pref("browser.bookmarks.openInTab", true);
+          user_pref("browser.bookmarks.item.title", "Google Drive");
+          user_pref("browser.bookmarks.item.uri", "https://drive.google.com");
+          user_pref("browser.bookmarks.item.bookmarkAdded", true);
+          user_pref("browser.bookmarks.bookmarkbar.visible", true);
+          user_pref("browser.bookmarks.item.container", "toolbar_____");
+
+    - name: Set permissions for user.js
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.mozilla/firefox/teacher-profile/user.js"
+        mode: '0644'
