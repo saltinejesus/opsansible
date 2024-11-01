@@ -1,0 +1,15 @@
+- name: Ensure UFW is installed
+  ansible.builtin.package:
+    name: ufw
+    state: present
+
+- name: Enable UFW and allow essential ports
+  ansible.builtin.ufw:
+    state: enabled
+    rule: allow
+    name: OpenSSH
+    port: 22
+
+- name: Set UFW default policies to deny incoming and allow outgoing
+  ansible.builtin.command: ufw default deny incoming
+  ansible.builtin.command: ufw default allow outgoing
