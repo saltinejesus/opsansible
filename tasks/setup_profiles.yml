@@ -1,0 +1,75 @@
+---
+- name: Create User Profiles and Configure Firefox
+  hosts: all
+  become: yes
+  vars:
+    - teacher_password: "{{ 'probonopublico' | password_hash('sha512') }}"
+    - admin_password: "{{ 'admin_password_here' | password_hash('sha512') }}"
+
+  tasks:
+    - name: Create Learner user with no password
+      ansible.builtin.user:
+        name: learner
+        state: present
+        password: '*'
+
+    - name: Create Teacher user with password
+      ansible.builtin.user:
+        name: teacher
+        state: present
+        password: "{{ teacher_password }}"
+
+    - name: Create Admin user with password
+      ansible.builtin.user:
+        name: admin
+        state: present
+        password: "{{ admin_password }}"
+
+    - name: Create directories for Firefox profiles
+      ansible.builtin.file:
+        path: "/home/{{ item }}/.mozilla/firefox"
+        state: directory
+        owner: "{{ item }}"
+        group: "{{ item }}"
+        mode: '0755'
+      loop:
+        - learner
+        - teacher
+        - admin
+
+    - name: Create Firefox profiles
+      ansible.builtin.command:
+        cmd: "firefox -CreateProfile '{{ item.profile }} {{ item.profile_path }}'"
+      loop:
+        - profile: "Learner"
+          profile_path: "/home/learner/.mozilla/firefox/learner-profile"
+        - profile: "Teacher"
+          profile_path: "/home/teacher/.mozilla/firefox/teacher-profile"
+        - profile: "Admin"
+          profile_path: "/home/admin/.mozilla/firefox/admin-profile"
+
+    - name: Set permissions for Firefox profiles
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.user }}"
+        group: "{{ item.user }}"
+        mode: '0755'
+      loop:
+        - path: "/home/learner/.mozilla/firefox/learner-profile"
+          user: learner
+        - path: "/home/teacher/.mozilla/firefox/teacher-profile"
+          user: teacher
+        - path: "/home/admin/.mozilla/firefox/admin-profile"
+          user: admin
+
+    - name: Configure Firefox profiles
+      ansible.builtin.copy:
+        dest: "{{ item.dest }}"
+        content: |
+          user_pref("browser.ssl_forbid_nonsecure", true);
+          user_pref("network.trr.uri", "https://your.custom.dns");
+      loop:
+        - dest: "/home/learner/.mozilla/firefox/learner-profile/user.js"
+        - dest: "/home/teacher/.mozilla/firefox/teacher-profile/user.js"
+        - dest: "/home/admin/.mozilla/firefox/admin-profile/user.js"
