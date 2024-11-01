@@ -1,0 +1,27 @@
+- name: Install Samba
+  ansible.builtin.package:
+    name: samba
+    state: present
+
+- name: Configure Samba share
+  ansible.builtin.copy:
+    dest: /etc/samba/smb.conf
+    content: |
+      [shared]
+      path = /srv/samba/share
+      browsable = yes
+      writable = yes
+      guest ok = yes
+      read only = no
+
+- name: Create Samba share directory
+  ansible.builtin.file:
+    path: /srv/samba/share
+    state: directory
+    mode: '0777'
+
+- name: Restart Samba service
+  ansible.builtin.service:
+    name: smbd
+    state: restarted
+    enabled: yes
